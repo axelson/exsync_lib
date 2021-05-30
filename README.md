@@ -1,11 +1,11 @@
-ExSync
+ExSyncLib
 ======
 
 Yet another Elixir reloader.
 
 ## System Support
 
-ExSync deps on [FileSystem](https://github.com/falood/file_system)
+ExSyncLib deps on [FileSystem](https://github.com/falood/file_system)
 
 ## Usage
 
@@ -15,25 +15,25 @@ ExSync deps on [FileSystem](https://github.com/falood/file_system)
 mix new my_app
 ```
 
-2. Add exsync to your `mix.exs` dependencies:
+2. Add exsync_lib to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
   [
-    {:exsync, "~> 0.2", only: :dev},
+    {:exsync_lib, "~> 0.2", only: :dev},
   ]
 end
 ```
 
 Optionally add this snippet to your `.iex.exs` (in the root of your project) or your `~/.iex.exs`:
 ```
-if Code.ensure_loaded?(ExSync) && function_exported?(ExSync, :register_group_leader, 0) do
-  ExSync.register_group_leader()
+if Code.ensure_loaded?(ExSyncLib) && function_exported?(ExSyncLib, :register_group_leader, 0) do
+  ExSyncLib.register_group_leader()
 end
 ```
 
-This will prevent the ExSync logs from overwriting your IEx prompt.
-Alternatively you can always just run `ExSync.register_group_leader()` in your
+This will prevent the ExSyncLib logs from overwriting your IEx prompt.
+Alternatively you can always just run `ExSyncLib.register_group_leader()` in your
 IEx prompt.
 
 ## Usage for umbrella project
@@ -44,20 +44,20 @@ IEx prompt.
 mix new my_umbrella_app --umbrella
 ```
 
-2. Add exsync to your `mix.exs` dependencies:
+2. Add exsync_lib to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
   [
-    {:exsync, "~> 0.2", only: :dev},
+    {:exsync_lib, "~> 0.2", only: :dev},
   ]
 end
 ```
 
-3. start your umbrella project with `exsync` task
+3. start your umbrella project with `exsync_lib` task
 
 ```bash
-iex -S mix exsync
+iex -S mix exsync_lib
 ```
 
 ## Config
@@ -69,7 +69,7 @@ All configuration for this library is handled via the application environment.
 For example, to monitor the `priv` directory, add this to your `config.exs`:
 
 ```elixir
-config :exsync, addition_dirs: ["/priv"]
+config :exsync_lib, addition_dirs: ["/priv"]
 ```
 
 `:extensions` - List of file extensions to watch for changes. Defaults to: `[".erl", ".hrl", ".ex", ".eex"]`
@@ -79,7 +79,7 @@ config :exsync, addition_dirs: ["/priv"]
 For example, to watch `.js` and `.css` files add this to your `config.exs`:
 
 ```elixir
-config :exsync, extra_extensions: [".js", ".css"]
+config :exsync_lib, extra_extensions: [".js", ".css"]
 ```
 
 `:logging_enabled` - Set to false to disable logging (default true)
@@ -91,7 +91,7 @@ config :exsync, extra_extensions: [".js", ".css"]
 For example, to call `MyApp.MyModule.handle_reload()` add this to your `config.exs`:
 
 ```elixir
-config :exsync,
+config :exsync_lib,
   reload_timeout: 75,
   reload_callback: {MyApp.MyModule, :handle_reload, []}
 ```

@@ -1,13 +1,13 @@
-defmodule ExSync.Utils do
+defmodule ExSyncLib.Utils do
   def recomplete do
-    ExSync.Logger.debug("running mix compile")
+    ExSyncLib.Logger.debug("running mix compile")
 
-    System.cmd("mix", ["compile"], cd: ExSync.Config.app_source_dir(), stderr_to_stdout: true)
+    System.cmd("mix", ["compile"], cd: ExSyncLib.Config.app_source_dir(), stderr_to_stdout: true)
     |> log_compile_cmd()
   end
 
   def unload(module) when is_atom(module) do
-    ExSync.Logger.debug("unload module #{inspect module}")
+    ExSyncLib.Logger.debug("unload module #{inspect module}")
     module |> :code.purge()
     module |> :code.delete()
   end
@@ -18,7 +18,7 @@ defmodule ExSync.Utils do
 
   # beam file path
   def reload(beam_path) do
-    ExSync.Logger.debug("reload module #{Path.basename(beam_path, ".beam")}")
+    ExSyncLib.Logger.debug("reload module #{Path.basename(beam_path, ".beam")}")
     file = beam_path |> to_charlist
     {:ok, binary, _} = :erl_prim_loader.get_file(file)
     module = beam_path |> Path.basename(".beam") |> String.to_atom()
@@ -26,7 +26,7 @@ defmodule ExSync.Utils do
   end
 
   defp log_compile_cmd({output, status} = result) when is_binary(output) and status > 0 do
-    ExSync.Logger.error(["error while compiling\n", output])
+    ExSyncLib.Logger.error(["error while compiling\n", output])
     result
   end
 
@@ -36,9 +36,9 @@ defmodule ExSync.Utils do
     message = ["compiling\n", output]
 
     if String.contains?(output, "warning:") do
-      ExSync.Logger.warn(message)
+      ExSyncLib.Logger.warn(message)
     else
-      ExSync.Logger.debug(message)
+      ExSyncLib.Logger.debug(message)
     end
 
     result

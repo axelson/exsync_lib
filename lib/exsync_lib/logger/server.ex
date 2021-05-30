@@ -1,6 +1,6 @@
-defmodule ExSync.Logger.Server do
+defmodule ExSyncLib.Logger.Server do
   @moduledoc """
-  Receives log messages from ExSync and sends them to the IEx group leader (if it exists)
+  Receives log messages from ExSyncLib and sends them to the IEx group leader (if it exists)
   """
 
   use GenServer
@@ -49,11 +49,11 @@ defmodule ExSync.Logger.Server do
   end
 
   defp maybe_log(message, level, group_leaders) do
-    if ExSync.Config.logging_enabled() do
+    if ExSyncLib.Config.logging_enabled() do
       if Enum.empty?(group_leaders) do
         Logger.log(level, message)
       else
-        message = color_message(["[exsync] ", message, "\n"], level)
+        message = color_message(["[exsync_lib] ", message, "\n"], level)
 
         MapSet.to_list(group_leaders)
         |> Enum.each(&IO.binwrite(&1, message))

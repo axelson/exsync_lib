@@ -1,6 +1,6 @@
 require Logger
 
-defmodule ExSync.Config do
+defmodule ExSyncLib.Config do
   def reload_timeout do
     Application.get_env(application(), :reload_timeout, 150)
   end
@@ -48,7 +48,7 @@ defmodule ExSync.Config do
     case Application.fetch_env(application(), :src_monitor) do
       :error ->
         Logger.debug([
-          "Defaulting to enable source monitor, set config :exsync, src_monitor: false",
+          "Defaulting to enable source monitor, set config :exsync_lib, src_monitor: false",
           " to disable\n"
         ])
 
@@ -103,7 +103,7 @@ defmodule ExSync.Config do
   end
 
   defp src_addition_dirs do
-    Application.get_env(:exsync, :addition_dirs, [])
+    Application.get_env(:exsync_lib, :addition_dirs, [])
     |> Enum.map(&Path.join(app_source_dir(), &1))
     |> Enum.filter(&File.exists?/1)
   end
@@ -118,14 +118,14 @@ defmodule ExSync.Config do
 
   def src_extensions do
     Application.get_env(
-      :exsync,
+      :exsync_lib,
       :extensions,
-      [".erl", ".hrl", ".ex", ".eex"] ++ Application.get_env(:exsync, :extra_extensions, [])
+      [".erl", ".hrl", ".ex", ".eex"] ++ Application.get_env(:exsync_lib, :extra_extensions, [])
     )
   end
 
   def application do
-    :exsync
+    :exsync_lib
   end
 
   def app_source_dir do

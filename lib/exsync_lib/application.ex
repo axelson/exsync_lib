@@ -1,27 +1,27 @@
 require Logger
 
-defmodule ExSync.Application do
+defmodule ExSyncLib.Application do
   def start(_, _) do
     case Mix.env() do
       :dev ->
         start_supervisor()
 
       _ ->
-        Logger.error("ExSync NOT started. Only `:dev` environment is supported.")
+        Logger.error("ExSyncLib NOT started. Only `:dev` environment is supported.")
         {:ok, self()}
     end
   end
 
   def start() do
-    Application.ensure_all_started(:exsync)
+    Application.ensure_all_started(:exsync_lib)
   end
 
   def start_supervisor do
     children =
       [
-        ExSync.Logger.Server,
+        ExSyncLib.Logger.Server,
         maybe_include_src_monitor(),
-        ExSync.BeamMonitor
+        ExSyncLib.BeamMonitor
       ]
       |> List.flatten()
 
@@ -29,19 +29,19 @@ defmodule ExSync.Application do
       strategy: :one_for_one,
       max_restarts: 2,
       max_seconds: 3,
-      name: ExSync.Supervisor
+      name: ExSyncLib.Supervisor
     ]
 
     Supervisor.start_link(children, opts)
   end
 
   def maybe_include_src_monitor do
-    if ExSync.Config.src_monitor_enabled() do
-      [ExSync.SrcMonitor]
+    if ExSyncLib.Config.src_monitor_enabled() do
+      [ExSyncLib.SrcMonitor]
     else
       []
     end
   end
 
-  defdelegate register_group_leader, to: ExSync.Logger.Server
+  defdelegate register_group_leader, to: ExSyncLib.Logger.Server
 end

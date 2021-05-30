@@ -1,4 +1,4 @@
-defmodule ExSync.SrcMonitor do
+defmodule ExSyncLib.SrcMonitor do
   use GenServer
 
   @throttle_timeout_ms 100
@@ -15,18 +15,18 @@ defmodule ExSync.SrcMonitor do
   def init([]) do
     {:ok, watcher_pid} =
       FileSystem.start_link(
-        dirs: ExSync.Config.src_dirs(),
+        dirs: ExSyncLib.Config.src_dirs(),
         backend: Application.get_env(:file_system, :backend)
       )
 
     FileSystem.subscribe(watcher_pid)
-    ExSync.Logger.debug("ExSync source monitor started.")
+    ExSyncLib.Logger.debug("ExSyncLib source monitor started.")
     {:ok, %State{watcher_pid: watcher_pid}}
   end
 
   @impl GenServer
   def handle_info({:file_event, watcher_pid, {path, events}}, %{watcher_pid: watcher_pid} = state) do
-    matching_extension? = Path.extname(path) in ExSync.Config.src_extensions()
+    matching_extension? = Path.extname(path) in ExSyncLib.Config.src_extensions()
 
     # This varies based on editor and OS - when saving a file in neovim on linux,
     # events received are:
@@ -48,12 +48,12 @@ defmodule ExSync.SrcMonitor do
   end
 
   def handle_info({:file_event, watcher_pid, :stop}, %{watcher_pid: watcher_pid} = state) do
-    ExSync.Logger.debug("ExSync src monitor stopped.")
+    ExSyncLib.Logger.debug("ExSyncLib src monitor stopped.")
     {:noreply, state}
   end
 
   def handle_info(:throttle_timer_complete, state) do
-    ExSync.Utils.recomplete()
+    ExSyncLib.Utils.recomplete()
     state = %State{state | throttle_timer: nil}
     {:noreply, state}
   end

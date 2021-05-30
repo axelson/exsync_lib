@@ -1,5 +1,5 @@
-defmodule ExSync.Logger do
-  alias ExSync.Logger.Server
+defmodule ExSyncLib.Logger do
+  alias ExSyncLib.Logger.Server
 
   defdelegate debug(message), to: Server
   defdelegate info(message), to: Server

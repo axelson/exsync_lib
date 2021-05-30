@@ -1,15 +1,15 @@
-defmodule ExSync.Mixfile do
+defmodule ExSyncLib.Mixfile do
   use Mix.Project
 
   def project do
     [
-      app: :exsync,
+      app: :exsync_lib,
       version: "0.2.4",
       elixir: "~> 1.4",
       elixirc_paths: ["lib", "web"],
       deps: deps(),
       description: "Yet another Elixir reloader.",
-      source_url: "https://github.com/falood/exsync",
+      source_url: "https://github.com/axelson/exsync_lib",
       package: package(),
       docs: [
         extras: ["README.md"],
@@ -20,7 +20,7 @@ defmodule ExSync.Mixfile do
 
   def application do
     [
-      mod: {ExSync.Application, []},
+      mod: {ExSyncLib.Application, []},
       extra_applications: [:logger]
     ]
   end
@@ -34,9 +34,9 @@ defmodule ExSync.Mixfile do
 
   defp package do
     %{
-      maintainers: ["Xiangrong Hao"],
+      maintainers: ["Jason Axelson"],
       licenses: ["BSD 3-Clause"],
-      links: %{"Github" => "https://github.com/falood/exsync"}
+      links: %{"Github" => "https://github.com/axelson/exsync_lib"}
     }
   end
 end

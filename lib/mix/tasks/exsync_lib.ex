@@ -6,6 +6,6 @@ defmodule Mix.Tasks.Exsync do
       Mix.env(:dev)
     end
 
-    Application.ensure_all_started(:exsync)
+    Application.ensure_all_started(:exsync_lib)
   end
 end
