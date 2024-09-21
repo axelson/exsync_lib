@@ -1,3 +1,13 @@
+# ExSyncLib
+
+ExSyncLib is a version of [exsync](https://github.com/falood/exsync/) that can be used as a library and is more configurable. If you want to reload code when it is updated and take granular actions then this might be a good fit.
+
+## Current Status
+
+ExSyncLib is partially finished, it might be workable but it is not documented and I don't currently have plans to support it or finish it.
+
+## TODO
+
 TODO:
 - [ ] Move mixfile parsing code from NervesLiveReload to ExSyncLib
 - [ ] Correctly handle default src_extensions
@@ -10,11 +20,6 @@ TODO:
 Thoughts:
 - Maybe this should be a behavior, that you have to pass an implementing module
   to in order to start the supervision tree
-
-ExSyncLib
-======
-
-Yet another Elixir reloader.
 
 ## System Support
 
