@@ -27,8 +27,11 @@ defmodule ExSyncLib.Mixfile do
 
   defp deps do
     [
+      {:beam_notify, "~> 1.0"},
       {:ex_doc, "~> 0.14", only: :docs},
-      {:file_system, "~> 0.2"}
+      {:file_system, "~> 0.2"},
+      {:jason, "~> 1.0"},
+      {:telemetry, "~> 1.0"}
     ]
   end
 

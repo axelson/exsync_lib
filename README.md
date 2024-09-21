@@ -1,3 +1,16 @@
+TODO:
+- [ ] Move mixfile parsing code from NervesLiveReload to ExSyncLib
+- [ ] Correctly handle default src_extensions
+- [ ] Pass in build_path and use `MIX_BUILD_PATH` to not stomp on the user's compiled code
+  - Or should it be `MIX_BUILD_ROOT`?
+  - [ ] This will involve modifying the beam_dirs to match
+- [ ] Run `mix compile` once before the beam watcher starts up
+  - This will save the beam watcher from not being able to watch directories because they don't yet exist
+  
+Thoughts:
+- Maybe this should be a behavior, that you have to pass an implementing module
+  to in order to start the supervision tree
+
 ExSyncLib
 ======
 

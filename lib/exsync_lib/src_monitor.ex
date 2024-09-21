@@ -1,32 +1,60 @@
 defmodule ExSyncLib.SrcMonitor do
   use GenServer
+  require Logger
 
   @throttle_timeout_ms 100
 
   defmodule State do
-    defstruct [:throttle_timer, :file_events, :watcher_pid]
+    defstruct [
+      :throttle_timer,
+      :file_events,
+      :watcher_pid,
+      :src_extensions,
+      :build_path,
+      :mixfile_dir,
+      :mix_target
+    ]
   end
 
-  def start_link(_opts \\ []) do
-    GenServer.start_link(__MODULE__, [])
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, opts)
   end
 
   @impl GenServer
-  def init([]) do
+  def init(opts) do
+    src_dirs = Keyword.fetch!(opts, :src_dirs)
+    src_extensions = Keyword.get(opts, :src_extensions, ExSyncLib.Config.src_extensions())
+    mixfile_dir = Keyword.get(opts, :mixfile_dir)
+    mix_target = Keyword.get(opts, :mix_target)
+    build_path = Keyword.get(opts, :build_path)
+
+    Logger.debug("ExSyncLib source dirs: #{inspect(src_dirs)}")
+
     {:ok, watcher_pid} =
       FileSystem.start_link(
-        dirs: ExSyncLib.Config.src_dirs(),
+        dirs: src_dirs,
         backend: Application.get_env(:file_system, :backend)
       )
 
     FileSystem.subscribe(watcher_pid)
-    ExSyncLib.Logger.debug("ExSyncLib source monitor started.")
-    {:ok, %State{watcher_pid: watcher_pid}}
+    Logger.debug("ExSyncLib source monitor started.")
+
+    state = %State{
+      build_path: build_path,
+      watcher_pid: watcher_pid,
+      src_extensions: src_extensions,
+      mixfile_dir: mixfile_dir,
+      mix_target: mix_target
+    }
+
+    {:ok, state}
   end
 
   @impl GenServer
   def handle_info({:file_event, watcher_pid, {path, events}}, %{watcher_pid: watcher_pid} = state) do
-    matching_extension? = Path.extname(path) in ExSyncLib.Config.src_extensions()
+    %State{src_extensions: src_extensions} = state
+
+    matching_extension? = Path.extname(path) in src_extensions
 
     # This varies based on editor and OS - when saving a file in neovim on linux,
     # events received are:
@@ -39,7 +67,7 @@ defmodule ExSyncLib.SrcMonitor do
 
     state =
       if matching_extension? && matching_event? do
-        maybe_recomplete(state)
+        maybe_compile_directory(state)
       else
         state
       end
@@ -48,20 +76,39 @@ defmodule ExSyncLib.SrcMonitor do
   end
 
   def handle_info({:file_event, watcher_pid, :stop}, %{watcher_pid: watcher_pid} = state) do
-    ExSyncLib.Logger.debug("ExSyncLib src monitor stopped.")
+    Logger.debug("ExSyncLib src monitor stopped.")
     {:noreply, state}
   end
 
   def handle_info(:throttle_timer_complete, state) do
-    ExSyncLib.Utils.recomplete()
+    compile_directory(state)
+
     state = %State{state | throttle_timer: nil}
     {:noreply, state}
   end
 
-  defp maybe_recomplete(%State{throttle_timer: nil} = state) do
+  defp maybe_compile_directory(%State{throttle_timer: nil} = state) do
     throttle_timer = Process.send_after(self(), :throttle_timer_complete, @throttle_timeout_ms)
     %State{state | throttle_timer: throttle_timer}
   end
 
-  defp maybe_recomplete(%State{} = state), do: state
+  defp maybe_compile_directory(%State{} = state), do: state
+
+  defp compile_directory(%State{} = state) do
+    %State{build_path: build_path, mixfile_dir: mixfile_dir, mix_target: mix_target} = state
+    IO.inspect(build_path, label: "build_path (src_monitor.ex:99)")
+
+    env = [
+      {"MIX_TARGET", mix_target},
+      {"MIX_BUILD_ROOT", build_path}
+    ]
+
+    :telemetry.execute(
+      [:exsync_lib, :compile, :start],
+      %{},
+      %{build_path: build_path}
+    )
+
+    ExSyncLib.Utils.compile_directory(mixfile_dir, env)
+  end
 end

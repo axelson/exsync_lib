@@ -13,6 +13,10 @@ defmodule ExSyncLib.Config do
     Application.get_env(application(), :reload_callback)
   end
 
+  def compile_env_vars do
+    Application.get_env(application(), :compile_env_vars, [])
+  end
+
   def beam_dirs do
     if Mix.Project.umbrella?() do
       for %Mix.Dep{app: app, opts: opts} <- Mix.Dep.Umbrella.loaded() do
@@ -129,6 +133,8 @@ defmodule ExSyncLib.Config do
   end
 
   def app_source_dir do
-    Path.dirname(Mix.ProjectStack.peek().file)
+    Application.get_env(application(), :source_dir, Path.dirname(Mix.ProjectStack.peek().file))
   end
+
+  def beam_notify_name, do: "exsync_lib"
 end
